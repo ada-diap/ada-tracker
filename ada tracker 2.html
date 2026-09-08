@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Ada Diap — Tracker</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{--bg:#080808;--bg1:#111;--bg2:#1a1a1a;--bg3:#242424;
+--or:#FF4D00;--ye:#C8FF00;--wh:#F0F0F0;--gr:#555;--bd:#252525;
+--bl:#4D9FFF;--gn:#18C87A;--pk:#FF4DA0;--pu:#9B59B6;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{background:var(--bg);color:var(--wh);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;min-height:100vh;}
+#app{max-width:500px;margin:0 auto;padding-bottom:88px;}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:500px;background:var(--bg1);border-top:1px solid var(--bd);display:flex;z-index:99;}
+.nav-btn{flex:1;padding:11px 4px 9px;border:none;background:none;color:var(--gr);font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.nav-btn .ico{font-size:18px;}
+.nav-btn.active{color:var(--or);}
+
+/* PROFILE HEADER */
+.profile-hdr{background:linear-gradient(135deg,#141414,#1c1000);padding:20px 16px 18px;border-bottom:1px solid var(--bd);}
+.avatar-row{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+.avatar-wrap{position:relative;width:66px;height:66px;flex-shrink:0;}
+.avatar{width:66px;height:66px;border-radius:50%;border:3px solid var(--or);object-fit:cover;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;}
+.avatar-edit{position:absolute;bottom:-2px;right:-2px;width:22px;height:22px;background:var(--or);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;border:2px solid var(--bg);}
+.profile-info{flex:1;}
+.profile-name{font-size:19px;font-weight:800;letter-spacing:-.02em;}
+.profile-level{font-size:10px;color:var(--or);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-top:2px;}
+.profile-days{font-size:10px;color:var(--gr);margin-top:2px;}
+.streak-box{text-align:center;background:var(--bg2);border-radius:10px;padding:6px 10px;border:1px solid var(--bd);}
+.streak-val{font-size:18px;font-weight:800;color:var(--ye);}
+.streak-lbl{font-size:7px;color:var(--gr);text-transform:uppercase;}
+.mini-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+.mini-stat{background:var(--bg2);border-radius:9px;padding:8px 6px;text-align:center;border:1px solid var(--bd);}
+.mini-stat-val{font-size:16px;font-weight:800;}
+.mini-stat-lbl{font-size:8px;color:var(--gr);text-transform:uppercase;margin-top:1px;}
+
+/* TABS */
+.tabs{display:flex;gap:5px;margin:12px 12px 0;overflow-x:auto;}
+.tab{flex:0 0 auto;padding:7px 13px;background:var(--bg2);border:1px solid var(--bd);border-radius:9px;font-size:11px;font-weight:700;color:var(--gr);cursor:pointer;}
+.tab.active{background:var(--or);color:#fff;border-color:var(--or);}
+
+/* LOG WORKOUT */
+.card{margin:10px 12px 0;background:var(--bg1);border-radius:13px;padding:14px 15px;border:1px solid var(--bd);}
+.card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gr);margin-bottom:10px;}
+.exo-select{width:100%;background:var(--bg2);border:1.5px solid var(--bd);border-radius:9px;color:var(--wh);font-size:13px;padding:10px 12px;margin-bottom:8px;}
+.log-row{display:grid;grid-template-columns:36px 1fr 1fr auto;gap:6px;align-items:center;margin-bottom:8px;}
+.log-input{background:var(--bg2);border:1.5px solid var(--bd);border-radius:8px;color:var(--ye);font-size:14px;font-weight:700;text-align:center;padding:8px 4px;-moz-appearance:textfield;}
+.log-input::-webkit-outer-spin-button,.log-input::-webkit-inner-spin-button{-webkit-appearance:none;}
+.log-input:focus{outline:none;border-color:var(--or);}
+.log-del{width:30px;height:30px;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;color:#c00;font-size:14px;cursor:pointer;}
+.log-lbls{display:grid;grid-template-columns:36px 1fr 1fr auto;gap:6px;margin-bottom:4px;}
+.log-lbl{font-size:8px;color:var(--gr);text-align:center;text-transform:uppercase;}
+.btn{width:100%;padding:12px;border:none;border-radius:11px;font-size:14px;font-weight:800;cursor:pointer;margin-top:8px;}
+.btn-or{background:var(--or);color:#fff;}
+.btn-ye{background:var(--ye);color:#000;}
+.btn-ghost{background:var(--bg2);color:var(--gr);border:1px solid var(--bd);font-size:12px;padding:9px;}
+.pr-badge{display:inline-flex;align-items:center;gap:4px;background:#1a1400;color:var(--ye);font-size:10px;font-weight:800;padding:4px 9px;border-radius:20px;border:1px solid var(--ye)44;margin-top:6px;}
+
+/* HISTORY LIST */
+.hist-day-card{margin:0 12px 8px;background:var(--bg1);border-radius:12px;border:1px solid var(--bd);overflow:hidden;}
+.hist-day-hdr{padding:11px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;}
+.hist-day-title{font-size:13px;font-weight:700;}
+.hist-day-date{font-size:10px;color:var(--gr);}
+.hist-day-vol{font-size:11px;color:var(--ye);font-weight:700;}
+.hist-day-body{display:none;padding:0 14px 12px;}
+.hist-day-body.open{display:block;}
+.hist-exo-row{padding:7px 0;border-bottom:1px solid var(--bg3);}
+.hist-exo-row:last-child{border-bottom:none;}
+.hist-exo-name{font-size:12px;font-weight:700;margin-bottom:2px;}
+.hist-exo-sets{font-size:11px;color:var(--gr);}
+
+/* STATS / GRAPHS */
+.exo-picker{width:100%;background:var(--bg2);border:1.5px solid var(--bd);border-radius:9px;color:var(--wh);font-size:13px;padding:10px 12px;margin-bottom:12px;}
+.chart-wrap{background:var(--bg1);border-radius:13px;padding:14px;border:1px solid var(--bd);margin:0 12px 10px;}
+.pr-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 12px 10px;}
+.pr-box{background:var(--bg1);border-radius:12px;padding:13px;border:1px solid var(--bd);}
+.pr-exo{font-size:10px;color:var(--gr);margin-bottom:3px;}
+.pr-val{font-size:18px;font-weight:800;color:var(--ye);}
+.pr-date{font-size:9px;color:var(--gr);margin-top:2px;}
+
+/* EVOLUTION / PHOTOS */
+.evo-upload{margin:10px 12px 0;background:var(--bg1);border:2px dashed var(--bd);border-radius:13px;padding:24px;text-align:center;cursor:pointer;}
+.evo-upload-ico{font-size:32px;margin-bottom:8px;}
+.evo-upload-txt{font-size:12px;color:var(--gr);}
+.evo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 12px 0;}
+.evo-photo{background:var(--bg1);border-radius:12px;overflow:hidden;border:1px solid var(--bd);position:relative;}
+.evo-photo img{width:100%;height:160px;object-fit:cover;display:block;}
+.evo-photo-date{padding:8px 10px;font-size:10px;color:var(--gr);}
+.evo-photo-del{position:absolute;top:6px;right:6px;width:24px;height:24px;background:rgba(0,0,0,.7);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:#c00;cursor:pointer;}
+.measure-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.measure-box{background:var(--bg2);border-radius:9px;padding:10px;}
+.measure-lbl{font-size:9px;color:var(--gr);margin-bottom:4px;}
+.measure-input{width:100%;background:var(--bg3);border:1.5px solid var(--bd);border-radius:7px;color:var(--ye);font-size:15px;font-weight:800;text-align:center;padding:6px;-moz-appearance:textfield;}
+.measure-input:focus{outline:none;border-color:var(--or);}
+.measure-unit{font-size:9px;color:var(--gr);text-align:center;margin-top:2px;}
+
+.empty{padding:30px 20px;text-align:center;color:var(--gr);font-size:13px;}
+.section-label{margin:14px 12px 8px;font-size:9px;color:var(--gr);text-transform:uppercase;letter-spacing:.14em;font-weight:700;}
+.hidden-input{display:none;}
+
+/* ROUTINES */
+.routine-card{margin:0 12px 10px;background:var(--bg1);border-radius:14px;border:1px solid var(--bd);overflow:hidden;}
+.routine-hero{padding:16px;position:relative;overflow:hidden;}
+.routine-tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;margin-bottom:3px;}
+.routine-name{font-size:19px;font-weight:800;margin-bottom:3px;letter-spacing:-.02em;}
+.routine-desc{font-size:11px;color:var(--gr);margin-bottom:10px;}
+.routine-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.routine-pill{padding:3px 9px;border-radius:20px;font-size:9px;font-weight:700;text-transform:uppercase;background:var(--bg2);color:var(--gr);border:1px solid var(--bd);}
+.routine-exo-preview{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;padding-bottom:2px;}
+.routine-exo-chip{flex:0 0 auto;background:var(--bg2);border-radius:8px;padding:6px 10px;font-size:10px;color:#ccc;border:1px solid var(--bd);white-space:nowrap;}
+.routine-start-btn{width:100%;padding:12px;border:none;border-radius:11px;font-weight:800;font-size:14px;cursor:pointer;color:#fff;}
+.routine-start-btn:active{transform:scale(.97);}
+.routine-done-badge{display:inline-flex;align-items:center;gap:4px;background:#0a1200;color:var(--ye);font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;border:1px solid var(--ye)33;margin-left:6px;}
+.week-selector{display:flex;align-items:center;justify-content:space-between;margin:10px 12px;background:var(--bg1);border-radius:11px;padding:10px 14px;border:1px solid var(--bd);}
+.week-arrow{width:30px;height:30px;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;color:var(--gr);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.week-label{font-size:13px;font-weight:800;}
+.exo-detail-card{background:var(--bg2);border-radius:10px;padding:10px 12px;margin-bottom:7px;}
+.exo-detail-name{font-size:12px;font-weight:700;margin-bottom:2px;}
+.exo-detail-meta{font-size:10px;color:var(--gr);}
+.exo-detail-tip{font-size:10px;color:#888;margin-top:5px;line-height:1.5;border-left:2px solid var(--or);padding-left:8px;}
+
+/* POST-WORKOUT SUMMARY (style MyFitCoach) */
+.summary-wrap{margin:14px 12px;background:linear-gradient(135deg,#0a1400,#0a1000);border:2px solid var(--ye);border-radius:16px;padding:22px 18px;text-align:center;}
+.summary-ico{font-size:44px;margin-bottom:8px;}
+.summary-title{font-size:24px;font-weight:800;color:var(--ye);margin-bottom:4px;}
+.summary-sub{font-size:11px;color:var(--gr);margin-bottom:18px;}
+.summary-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.summary-stat{background:var(--bg1);border-radius:11px;padding:12px;border:1px solid var(--bd);}
+.summary-stat-val{font-size:20px;font-weight:800;}
+.summary-stat-lbl{font-size:9px;color:var(--gr);text-transform:uppercase;margin-top:2px;}
+.summary-pr-list{text-align:left;margin-bottom:14px;}
+.summary-pr-title{font-size:10px;color:var(--ye);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;}
+.summary-pr-item{display:flex;align-items:center;gap:8px;background:var(--bg1);border-radius:9px;padding:9px 12px;margin-bottom:6px;border-left:3px solid var(--ye);}
+.summary-pr-ico{font-size:16px;}
+.summary-pr-text{font-size:12px;color:#ddd;}
+.summary-exo-compare{text-align:left;margin-bottom:14px;}
+.summary-compare-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1a1a00;}
+.summary-compare-item:last-child{border-bottom:none;}
+.compare-name{font-size:11px;color:#ccc;}
+.compare-trend{font-size:11px;font-weight:800;}
+.compare-up{color:var(--ye);}
+.compare-same{color:var(--gr);}
+.compare-down{color:#c00;}
+
+/* EXERCISE VISUAL */
+.exo-visual{width:100%;height:110px;background:#0d0d0d;border-radius:10px;overflow:hidden;margin-bottom:10px;border:1px solid var(--bd);}
+.exo-visual svg{width:100%;height:100%;display:block;}
+.routine-exo-chip-visual{width:44px;height:44px;border-radius:8px;overflow:hidden;background:#0d0d0d;flex-shrink:0;margin-right:6px;}
+.routine-exo-chip-visual svg{width:100%;height:100%;display:block;}
+.routine-exo-chip-v2{display:flex;align-items:center;gap:0;flex:0 0 auto;background:var(--bg2);border-radius:8px;padding:4px 10px 4px 4px;border:1px solid var(--bd);}
+
+/* ANIMATIONS DE MOUVEMENT — simulent une vidéo en boucle */
+.exo-visual svg{overflow:visible;}
+@keyframes pushup{0%,100%{transform:translateY(0);}50%{transform:translateY(10px);}}
+@keyframes pullup{0%,100%{transform:translateY(0);}50%{transform:translateY(-14px);}}
+@keyframes dip{0%,100%{transform:translateY(0);}50%{transform:translateY(14px);}}
+@keyframes squat{0%,100%{transform:translateY(0) scaleY(1);transform-origin:100px 118px;}50%{transform:translateY(16px) scaleY(0.85);transform-origin:100px 118px;}}
+@keyframes curl{0%,100%{transform:rotate(0deg);transform-origin:90px 50px;}50%{transform:rotate(35deg);transform-origin:90px 50px;}}
+@keyframes curlR{0%,100%{transform:rotate(0deg);transform-origin:110px 50px;}50%{transform:rotate(-35deg);transform-origin:110px 50px;}}
+@keyframes press{0%,100%{transform:translateY(0);}50%{transform:translateY(-16px);}}
+@keyframes lateral{0%,100%{transform:rotate(0deg);transform-origin:100px 60px;}50%{transform:rotate(-25deg);transform-origin:100px 60px;}}
+@keyframes lunge{0%,100%{transform:translateY(0);}50%{transform:translateY(10px);}}
+@keyframes rowpull{0%,100%{transform:translateX(0);}50%{transform:translateX(-14px);}}
+.anim-pushup{animation:pushup 1.6s ease-in-out infinite;}
+.anim-pullup{animation:pullup 1.6s ease-in-out infinite;}
+.anim-dip{animation:dip 1.6s ease-in-out infinite;}
+.anim-squat{animation:squat 1.8s ease-in-out infinite;}
+.anim-curl-l{animation:curl 1.4s ease-in-out infinite;}
+.anim-curl-r{animation:curlR 1.4s ease-in-out infinite;}
+.anim-press{animation:press 1.6s ease-in-out infinite;}
+.anim-lateral{animation:lateral 1.6s ease-in-out infinite;}
+.anim-lunge{animation:lunge 1.6s ease-in-out infinite;}
+.anim-row{animation:rowpull 1.5s ease-in-out infinite;}
+.video-badge{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);color:var(--ye);font-size:8px;font-weight:700;padding:3px 7px;border-radius:12px;display:flex;align-items:center;gap:3px;}
+.exo-visual{position:relative;}
+
+.video-link-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:linear-gradient(135deg,#c4302b,#8b0000);border:none;border-radius:10px;color:#fff;font-weight:800;font-size:13px;cursor:pointer;margin-bottom:9px;text-decoration:none;}
+.video-link-btn:active{transform:scale(.97);}
+.video-link-ico{font-size:16px;}
+
+.adapt-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:800;padding:3px 8px;border-radius:20px;margin-top:4px;}
+.adapt-up{background:#0a1200;color:var(--ye);border:1px solid var(--ye)44;}
+.adapt-same{background:var(--bg2);color:var(--gr);border:1px solid var(--bd);}
+.adapt-down{background:#1a0a00;color:#ff8866;border:1px solid #ff886644;}
+.adapt-new{background:var(--bg2);color:var(--bl);border:1px solid var(--bl)33;}
+.adapt-explain{font-size:9px;color:var(--gr);margin-top:3px;line-height:1.4;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ═══════════════════════════════════════════════
+// EXERCICES DISPONIBLES (basés sur ton programme)
+// ═══════════════════════════════════════════════
+const EXERCISES=[
+  "Dips","Tractions Pronation","Tractions Supination","Pompes","Pompes Archer","Pompes Diamant",
+  "Press Épaules Haltères","Élévations Latérales","Curl Barre Z","Curl Marteau","Extension Triceps Z",
+  "Squat","Squat Bulgare","Fentes","Romanian Deadlift","Développé Couché","Tirage Horizontal",
+  "Presse à Cuisses","Développé Militaire","Tirage Vertical","Rowing Inversé","Muscle-Up","Autre"
+];
+
+
+const ROUTINES=[
+  {id:0,label:"LUN",tag:"PUSH A",col:"#FF4D00",focus:"Push · Épaules · Triceps",
+   desc:"Dips · Pompes Archer · Press · Extension Z",timeMin:50,
+   exos:[
+     {name:"Dips",sets:5,target:"5–6",tip:"Descends 90° complet. Torse légèrement penché avant. Tempo 3-0-1."},
+     {name:"Pompes Archer",sets:4,target:"5/côté",tip:"Une main large, autre serrée. Transfert du poids sur le bras fléchi."},
+     {name:"Press Épaules Haltères",sets:4,target:"6–8",tip:"Debout, coudes 90° en bas. Pousse vertical strict. Descend 3s."},
+     {name:"Élévations Latérales",sets:3,target:"12–15",tip:"Bras légèrement fléchis. Monte à l'horizontale. Descend 4s."},
+     {name:"Extension Triceps Z",sets:4,target:"6–8",tip:"Coudes fixes pointés vers le haut. Descend derrière tête 3s."},
+     {name:"Squat Bulgare",sets:3,target:"8/côté",tip:"Pied arrière sur la barre basse. Genou avant à 90°."},
+   ]},
+  {id:1,label:"MAR",tag:"PULL A",col:"#4D9FFF",focus:"Tractions · Curl · Dos",
+   desc:"Tractions lourdes · Rowing · Curl Z · Marteau",timeMin:50,
+   exos:[
+     {name:"Tractions Pronation",sets:5,target:"4–6",tip:"Prise large. Omoplate rétractées avant de tirer. Menton au-dessus."},
+     {name:"Tractions Supination",sets:4,target:"5–7",tip:"Prise supination épaule de largeur. Biceps actif."},
+     {name:"Rowing Inversé",sets:3,target:"10–12",tip:"Corps incliné rigide. Monte 1s, tiens 1s, descend 4s."},
+     {name:"Curl Barre Z",sets:5,target:"5–7",tip:"Charge max. Coudes fixes. Monte 2s, descend 3s."},
+     {name:"Curl Marteau",sets:3,target:"8–10",tip:"Prise neutre. Coudes fixes. Descend 3s."},
+     {name:"Romanian Deadlift",sets:3,target:"8–10",tip:"Torse en avant dos droit. Descends jusqu'aux ischio."},
+   ]},
+  {id:2,label:"MER",tag:"PUSH B",col:"#18C87A",focus:"Push Variantes · Explosivité",
+   desc:"Dips lestés · Pompes explosives · Press lourd",timeMin:50,
+   exos:[
+     {name:"Dips",sets:5,target:"4–5",tip:"Plus lourd que lundi. Rajoute du lest si possible."},
+     {name:"Pompes Diamant",sets:4,target:"6–8",tip:"Hanches en V. Tête vers le sol. Sac à dos chargé si possible."},
+     {name:"Développé Militaire",sets:3,target:"8–10",tip:"Épaules antérieures + triceps."},
+     {name:"Pompes",sets:3,target:"Max",tip:"Test hebdo. Corps planche parfaite. Arrête dès que la forme casse."},
+     {name:"Fentes",sets:3,target:"10/côté",tip:"Grand pas. Genou avant = orteils. Torse droit."},
+     {name:"Squat",sets:2,target:"20",tip:"Profond, contrôlé. Test force-endurance."},
+   ]},
+  {id:3,label:"JEU",tag:"PULL B",col:"#C8FF00",focus:"Pull Lourd · Test · Biceps",
+   desc:"Tractions max · RDL · Curl lourd",timeMin:50,
+   exos:[
+     {name:"Tractions Pronation",sets:3,target:"Max",tip:"Test hebdo. Va jusqu'à l'échec sur chaque série. Note le total."},
+     {name:"Tractions Supination",sets:4,target:"3–5",tip:"Plus lourd que mardi. Chaque rep parfaite. Descend 4s."},
+     {name:"Curl Barre Z",sets:4,target:"6+8",tip:"Enchaîne curl Z puis curl marteau sans repos."},
+     {name:"Rowing Inversé",sets:3,target:"8",tip:"Monte en 1s, descend en 4s."},
+     {name:"Press Épaules Haltères",sets:3,target:"5–6",tip:"Charge max de la semaine."},
+     {name:"Romanian Deadlift",sets:3,target:"8–10",tip:"Torse en avant dos droit."},
+   ]},
+]
+
+const KEY="ada_tracker_v1";
+let state={
+  view:"routines", logView:"nouvelle",
+  profile:{name:"Ada",avatar:null,level:"Intermédiaire",startDate:null},
+  workouts:[], // {id,date,exercises:[{name,sets:[{reps,weight}]}]}
+  currentLog:{exercises:[]},
+  measurements:[], // {date,weight,chest,arms,waist,thighs}
+  photos:[], // {date,img}
+  openHist:{},
+  statsExo:EXERCISES[0],
+  currentWeek:1,
+  routineDetailOpen:null,
+  activeRoutineId:null,
+  lastSummary:null,
+};
+
+function load(){
+  try{
+    const s=localStorage.getItem(KEY);
+    if(s){const d=JSON.parse(s);Object.assign(state,{
+      profile:d.profile||state.profile,
+      workouts:d.workouts||[],
+      measurements:d.measurements||[],
+      photos:d.photos||[],
+    });}
+  }catch(e){}
+  if(!state.profile.startDate)state.profile.startDate=today();
+}
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify({
+    profile:state.profile,workouts:state.workouts,measurements:state.measurements,photos:state.photos
+  }));}catch(e){}
+}
+function today(){return new Date().toISOString().slice(0,10);}
+function fmtDate(d){return new Date(d+"T12:00:00").toLocaleDateString("fr-FR",{day:"2-digit",month:"short",year:"2-digit"});}
+function daysSince(d){return Math.floor((new Date()-new Date(d))/(1000*60*60*24));}
+
+
+// ═══════════════════════════════════════════════
+// MOTEUR D'AJUSTEMENT AUTOMATIQUE (progression hebdo)
+// ═══════════════════════════════════════════════
+function getExoHistory(name){
+  // Toutes les occurrences de cet exercice, triées par date
+  const occ=[];
+  state.workouts.forEach(w=>{
+    w.exercises.forEach(e=>{
+      if(e.name===name)occ.push({date:w.date,sets:e.sets});
+    });
+  });
+  return occ.sort((a,b)=>a.date.localeCompare(b.date));
+}
+
+function computeAdaptiveTarget(name,baseTarget,baseSets){
+  const hist=getExoHistory(name);
+  if(!hist.length)return{target:baseTarget,sets:baseSets,trend:"new",reason:"Objectif de départ — pas encore de données"};
+
+  const last=hist[hist.length-1];
+  const validSets=last.sets.filter(s=>s.reps!==""&&s.reps!==null);
+  if(!validSets.length)return{target:baseTarget,sets:baseSets,trend:"same",reason:"Dernière séance incomplète"};
+
+  const reps=validSets.map(s=>parseInt(s.reps)||0);
+  const weights=validSets.map(s=>parseFloat(s.weight)||0);
+  const avgReps=reps.reduce((a,b)=>a+b,0)/reps.length;
+  const maxWeight=Math.max(...weights);
+  const minReps=Math.min(...reps);
+
+  // Parse la cible de base (ex: "5–6" -> [5,6], "Max" -> null, "12–15" -> [12,15])
+  const rangeMatch=baseTarget.match(/(\d+)[–\-](\d+)/);
+  const isBodyweightExo=isBodyweight(name);
+
+  if(!rangeMatch){
+    // Cible "Max" — pas d'ajustement de range, juste affiche le dernier score comme référence
+    return{target:baseTarget,sets:baseSets,trend:"same",reason:`Dernier record : ${Math.round(avgReps)} reps${maxWeight>0?' à '+maxWeight+'kg':''}`};
+  }
+
+  const lowTarget=parseInt(rangeMatch[1]),highTarget=parseInt(rangeMatch[2]);
+  const hitTop=minReps>=highTarget;
+  const hitAll=minReps>=lowTarget;
+
+  if(hitTop){
+    // Toutes les séries au top de la fourchette → progression
+    if(isBodyweightExo){
+      return{target:baseTarget,sets:baseSets,trend:"up",
+        reason:`💪 Semaine dernière : ${minReps}+ reps sur toutes les séries. Ajoute du lest (+2,5kg) ou vise le haut de la fourchette suivante.`};
+    }else{
+      const newWeight=maxWeight>0?Math.round((maxWeight+2.5)*10)/10:null;
+      return{target:baseTarget,sets:baseSets,trend:"up",
+        reason:`💪 Objectif atteint sur toutes les séries à ${maxWeight}kg. Essaie ${newWeight}kg cette semaine.`};
+    }
+  }else if(hitAll){
+    return{target:baseTarget,sets:baseSets,trend:"same",
+      reason:`✓ Dans la fourchette (min ${minReps} reps). Consolide avant d'augmenter.`};
+  }else{
+    return{target:baseTarget,sets:baseSets,trend:"down",
+      reason:`⚠️ Sous l'objectif (min ${minReps} vs ${lowTarget} visé). Garde la même charge, focus sur la technique.`};
+  }
+}
+
+function computeStreak(){
+  if(!state.workouts.length)return 0;
+  const dates=[...new Set(state.workouts.map(w=>w.date))].sort().reverse();
+  let streak=0;let cursor=new Date(today());
+  for(let i=0;i<dates.length;i++){
+    const wd=new Date(dates[i]);
+    const diff=Math.round((cursor-wd)/(1000*60*60*24));
+    if(diff<=1){streak++;cursor=wd;}else break;
+  }
+  return streak;
+}
+function totalVolume(){
+  return state.workouts.reduce((tot,w)=>tot+w.exercises.reduce((t2,e)=>
+    t2+e.sets.reduce((t3,s)=>t3+(parseFloat(s.weight)||0)*(parseInt(s.reps)||0),0),0),0);
+}
+function getPRs(){
+  const prs={};
+  state.workouts.forEach(w=>{
+    w.exercises.forEach(e=>{
+      e.sets.forEach(s=>{
+        const w_=parseFloat(s.weight)||0,r=parseInt(s.reps)||0;
+        if(!prs[e.name]||w_>prs[e.name].weight||(w_===prs[e.name].weight&&r>prs[e.name].reps)){
+          prs[e.name]={weight:w_,reps:r,date:w.date};
+        }
+      });
+    });
+  });
+  return prs;
+}
+
+// ═══════════════════════════════
+// RENDER
+// ═══════════════════════════════
+let chartInstance=null;
+
+function renderApp(){
+  const app=document.getElementById("app");
+  let html=renderProfileHeader();
+  if(state.view==="summary")return renderSummaryScreen();
+  if(state.view==="routines")html+=renderRoutines();
+  else if(state.view==="log")html+=renderLog();
+  else if(state.view==="history")html+=renderHistory();
+  else if(state.view==="stats")html+=renderStats();
+  else if(state.view==="evolution")html+=renderEvolution();
+  html+=renderNav();
+  app.innerHTML=html;
+
+  if(state.view==="stats")setTimeout(renderChart,50);
+}
+
+function renderProfileHeader(){
+  const streak=computeStreak();
+  const totalW=state.workouts.length;
+  const totalVol=Math.round(totalVolume());
+  const days=daysSince(state.profile.startDate);
+  return`<div class="profile-hdr">
+    <div class="avatar-row">
+      <div class="avatar-wrap">
+        <div class="avatar" onclick="document.getElementById('avatar-input').click()">
+          ${state.profile.avatar?`<img src="${state.profile.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`:"💪"}
+        </div>
+        <div class="avatar-edit" onclick="document.getElementById('avatar-input').click()">✏️</div>
+        <input type="file" id="avatar-input" class="hidden-input" accept="image/*" onchange="uploadAvatar(this)">
+      </div>
+      <div class="profile-info">
+        <div class="profile-name">${state.profile.name}</div>
+        <div class="profile-level">${state.profile.level}</div>
+        <div class="profile-days">${days} jours de suivi</div>
+      </div>
+      <div class="streak-box">
+        <div class="streak-val">🔥${streak}</div>
+        <div class="streak-lbl">Streak</div>
+      </div>
+    </div>
+    <div class="mini-stats">
+      <div class="mini-stat"><div class="mini-stat-val" style="color:var(--or)">${totalW}</div><div class="mini-stat-lbl">Séances</div></div>
+      <div class="mini-stat"><div class="mini-stat-val" style="color:var(--ye)">${(totalVol/1000).toFixed(1)}t</div><div class="mini-stat-lbl">Volume total</div></div>
+      <div class="mini-stat"><div class="mini-stat-val" style="color:var(--bl)">${Object.keys(getPRs()).length}</div><div class="mini-stat-lbl">Records</div></div>
+    </div>
+  </div>`;
+}
+
+function renderLog(){
+  const cl=state.currentLog;
+  let html=`<div class="card">
+    <div class="card-title">➕ Ajouter un exercice</div>
+    <select class="exo-select" id="exo-select">
+      ${EXERCISES.map(e=>`<option value="${e}">${e}</option>`).join('')}
+    </select>
+    <button class="btn btn-or" onclick="addExoToLog()">Ajouter à la séance</button>
+  </div>`;
+
+  if(cl.exercises.length){
+    html+=`<div class="section-label">SÉANCE EN COURS — ${fmtDate(today())}</div>`;
+    cl.exercises.forEach((exo,ei)=>{
+      const prs=getPRs();
+      const pr=prs[exo.name];
+      html+=`<div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div>
+            <div class="card-title" style="margin:0">${exo.name}</div>
+            ${exo.target?`<div style="font-size:10px;color:var(--gr);margin-top:2px">Cible : ${exo.sets.length}× ${exo.target}</div>`:''}
+            ${exo.adaptReason?`<div class="adapt-badge adapt-${exo.adaptTrend}">${exo.adaptTrend==='up'?'↑ Progression':exo.adaptTrend==='down'?'↓ Maintien':exo.adaptTrend==='new'?'● Nouveau':'= Stable'}</div>
+            <div class="adapt-explain">${exo.adaptReason}</div>`:''}
+          </div>
+          <div style="font-size:16px;color:#c00;cursor:pointer" onclick="removeExoFromLog(${ei})">✕</div>
+        </div>
+        <a href="${getYoutubeSearchUrl(exo.name)}" target="_blank" class="video-link-btn"><span class="video-link-ico">▶</span> VOIR LA VIDÉO DU MOUVEMENT</a>
+        <div class="exo-visual">${getExoVisual(exo.name)}<div class="video-badge">Schéma</div></div>
+        ${pr?`<div class="pr-badge">🏆 PR actuel: ${pr.weight}kg × ${pr.reps}</div>`:''}
+        ${(()=>{const bw=isBodyweight(exo.name);return`
+        <div class="log-lbls" style="margin-top:8px">
+          <div class="log-lbl" style="text-align:left">Série</div>
+          <div class="log-lbl">Répétitions</div>
+          <div class="log-lbl">${bw?"Lest ajouté (kg)":"Charge (kg)"}</div>
+          <div></div>
+        </div>
+        ${bw?`<div style="font-size:10px;color:var(--gr);margin-bottom:8px;background:var(--bg2);border-radius:7px;padding:6px 10px">💡 Poids du corps — laisse "Lest" à 0 si tu n'ajoutes rien</div>`:''}
+        ${exo.sets.map((s,si)=>`<div class="log-row">
+          <div style="text-align:left;font-size:13px;color:var(--wh);font-weight:800">S${si+1}</div>
+          <input class="log-input" type="number" placeholder="reps" value="${s.reps}" oninput="updateSet(${ei},${si},'reps',this.value)" style="color:var(--ye)">
+          <input class="log-input" type="number" placeholder="${bw?'0':'kg'}" value="${s.weight}" oninput="updateSet(${ei},${si},'weight',this.value)" style="color:${bw?'var(--gr)':'var(--or)'}">
+          <button class="log-del" onclick="removeSet(${ei},${si})">−</button>
+        </div>`).join('')}
+        `;})()}
+        <button class="btn btn-ghost" onclick="addSet(${ei})">+ Ajouter une série</button>
+      </div>`;
+    });
+    html+=`<div style="padding:0 12px">
+      <button class="btn btn-ye" onclick="finishWorkout()">✓ TERMINER LA SÉANCE</button>
+    </div>`;
+  }else{
+    html+=`<div class="empty">Ajoute un exercice pour commencer ta séance.</div>`;
+  }
+  return html;
+}
+
+function renderHistory(){
+  let html=`<div style="height:8px"></div>`;
+  if(!state.workouts.length)return html+`<div class="empty">Aucune séance enregistrée pour l'instant.</div>`;
+  [...state.workouts].reverse().forEach(w=>{
+    const open=state.openHist[w.id];
+    const vol=w.exercises.reduce((t,e)=>t+e.sets.reduce((t2,s)=>t2+(parseFloat(s.weight)||0)*(parseInt(s.reps)||0),0),0);
+    html+=`<div class="hist-day-card">
+      <div class="hist-day-hdr" onclick="toggleHist(${w.id})">
+        <div>
+          <div class="hist-day-title">${fmtDate(w.date)}</div>
+          <div class="hist-day-date">${w.exercises.length} exercices</div>
+        </div>
+        <div style="text-align:right">
+          <div class="hist-day-vol">${Math.round(vol)} kg vol.</div>
+          <div style="font-size:9px;color:var(--gr);margin-top:2px">${open?'▲':'▼'}</div>
+        </div>
+      </div>
+      <div class="hist-day-body${open?' open':''}">
+        ${w.exercises.map(e=>`<div class="hist-exo-row">
+          <div class="hist-exo-name">${e.name}</div>
+          <div class="hist-exo-sets">${e.sets.map(s=>`${s.weight}kg×${s.reps}`).join(' · ')}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  });
+  return html;
+}
+
+function renderStats(){
+  const prs=getPRs();
+  let html=`<div style="height:8px"></div>
+  <div class="section-label">🏆 RECORDS PERSONNELS</div>
+  <div class="pr-grid">
+    ${Object.entries(prs).slice(0,6).map(([name,pr])=>`<div class="pr-box">
+      <div class="pr-exo">${name}</div>
+      <div class="pr-val">${pr.weight}kg × ${pr.reps}</div>
+      <div class="pr-date">${fmtDate(pr.date)}</div>
+    </div>`).join('')}
+  </div>
+  <div class="section-label">📈 GRAPHIQUE DE PROGRESSION</div>
+  <div style="margin:0 12px">
+    <select class="exo-picker" id="stats-exo-select" onchange="changeStatsExo(this.value)">
+      ${Object.keys(prs).map(e=>`<option value="${e}" ${e===state.statsExo?'selected':''}>${e}</option>`).join('')}
+    </select>
+  </div>
+  <div class="chart-wrap">
+    <canvas id="prog-chart" height="180"></canvas>
+  </div>`;
+  return html;
+}
+
+function renderEvolution(){
+  let html=`<div style="height:8px"></div>
+  <div class="section-label">⚖️ MESURES CORPORELLES</div>
+  <div class="card">
+    <div class="card-title">Ajouter une mesure aujourd'hui</div>
+    <div class="measure-grid">
+      <div class="measure-box"><div class="measure-lbl">Poids</div><input class="measure-input" type="number" id="m-weight" placeholder="85"><div class="measure-unit">kg</div></div>
+      <div class="measure-box"><div class="measure-lbl">Poitrine</div><input class="measure-input" type="number" id="m-chest" placeholder="100"><div class="measure-unit">cm</div></div>
+      <div class="measure-box"><div class="measure-lbl">Bras</div><input class="measure-input" type="number" id="m-arms" placeholder="35"><div class="measure-unit">cm</div></div>
+      <div class="measure-box"><div class="measure-lbl">Taille</div><input class="measure-input" type="number" id="m-waist" placeholder="85"><div class="measure-unit">cm</div></div>
+    </div>
+    <button class="btn btn-or" onclick="saveMeasurement()">Enregistrer</button>
+  </div>`;
+
+  if(state.measurements.length){
+    html+=`<div class="section-label">HISTORIQUE MESURES</div>`;
+    [...state.measurements].reverse().slice(0,5).forEach(m=>{
+      html+=`<div class="card" style="padding:11px 15px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:11px;color:var(--gr)">${fmtDate(m.date)}</div>
+          <div style="font-size:13px;font-weight:800;color:var(--ye)">${m.weight}kg</div>
+        </div>
+        <div style="font-size:10px;color:var(--gr);margin-top:4px">Poitrine ${m.chest}cm · Bras ${m.arms}cm · Taille ${m.waist}cm</div>
+      </div>`;
+    });
+  }
+
+  html+=`<div class="section-label">📸 PHOTOS D'ÉVOLUTION</div>
+  <div class="evo-upload" onclick="document.getElementById('photo-input').click()">
+    <div class="evo-upload-ico">📷</div>
+    <div class="evo-upload-txt">Ajouter une photo d'aujourd'hui</div>
+    <input type="file" id="photo-input" class="hidden-input" accept="image/*" onchange="uploadPhoto(this)">
+  </div>`;
+
+  if(state.photos.length){
+    html+=`<div class="evo-grid">
+      ${[...state.photos].reverse().map(p=>`<div class="evo-photo">
+        <img src="${p.img}">
+        <div class="evo-photo-del" onclick="deletePhoto('${p.id}')">✕</div>
+        <div class="evo-photo-date">${fmtDate(p.date)}</div>
+      </div>`).join('')}
+    </div>`;
+  }
+  return html;
+}
+
+function renderChart(){
+  const canvas=document.getElementById("prog-chart");
+  if(!canvas)return;
+  const data=[];
+  state.workouts.forEach(w=>{
+    w.exercises.forEach(e=>{
+      if(e.name===state.statsExo){
+        const maxSet=e.sets.reduce((max,s)=>{
+          const wt=parseFloat(s.weight)||0;
+          return wt>max.weight?{weight:wt,reps:parseInt(s.reps)||0}:max;
+        },{weight:0,reps:0});
+        data.push({date:w.date,weight:maxSet.weight});
+      }
+    });
+  });
+  data.sort((a,b)=>a.date.localeCompare(b.date));
+  if(chartInstance){chartInstance.destroy();chartInstance=null;}
+  if(!data.length)return;
+  chartInstance=new Chart(canvas,{
+    type:"line",
+    data:{
+      labels:data.map(d=>fmtDate(d.date)),
+      datasets:[{data:data.map(d=>d.weight),borderColor:"#FF4D00",backgroundColor:"rgba(255,77,0,.12)",tension:.35,pointBackgroundColor:"#C8FF00",pointRadius:5,fill:true}]
+    },
+    options:{
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:"#666",font:{size:10}},grid:{color:"#1a1a1a"}},
+        y:{ticks:{color:"#666",font:{size:10}},grid:{color:"#1a1a1a"}}
+      }
+    }
+  });
+}
+
+
+function renderRoutines(){
+  const todayDow=new Date().getDay(); // 0=dim,1=lun...
+  const todayRoutineId=todayDow>=1&&todayDow<=5?todayDow-1:null;
+  let html=`<div class="week-selector">
+    <div class="week-arrow" onclick="changeWeek(-1)">‹</div>
+    <div class="week-label">📅 SEMAINE ${state.currentWeek}</div>
+    <div class="week-arrow" onclick="changeWeek(1)">›</div>
+  </div>`;
+
+  ROUTINES.forEach(r=>{
+    const doneToday=state.workouts.some(w=>w.date===today()&&w.routineId===r.id);
+    const isToday=r.id===todayRoutineId;
+    html+=`<div class="routine-card">
+      <div class="routine-hero" style="background:linear-gradient(135deg,#141414,${r.col}11)">
+        <div class="routine-tag" style="color:${r.col}">${r.label} · ${r.tag} ${isToday?'<span style="color:var(--ye)">· AUJOURD\'HUI</span>':''}</div>
+        <div class="routine-name">${r.focus} ${doneToday?`<span class="routine-done-badge">✓ FAIT</span>`:''}</div>
+        <div class="routine-desc">${r.desc}</div>
+        <div class="routine-meta">
+          <span class="routine-pill">⏱ ${r.timeMin} min</span>
+          <span class="routine-pill">${r.exos.length} exercices</span>
+        </div>
+        <div class="routine-exo-preview">
+          ${r.exos.map(e=>{
+            const adapt=computeAdaptiveTarget(e.name,e.target,e.sets);
+            const trendIcon=adapt.trend==="up"?"↑":adapt.trend==="down"?"↓":adapt.trend==="new"?"●":"=";
+            const trendColor=adapt.trend==="up"?"var(--ye)":adapt.trend==="down"?"#ff8866":adapt.trend==="new"?"var(--bl)":"var(--gr)";
+            return`<div class="routine-exo-chip-v2">
+              <div class="routine-exo-chip-visual">${getExoVisual(e.name)}</div>
+              <span>${e.name} <b style="color:${trendColor}">${trendIcon}</b></span>
+            </div>`;
+          }).join('')}
+        </div>
+        <button class="routine-start-btn" style="background:${r.col}" onclick="startRoutine(${r.id})">▶ DÉMARRER CETTE SÉANCE</button>
+      </div>
+    </div>`;
+  });
+  return html;
+}
+
+function changeWeek(dir){
+  state.currentWeek=Math.max(1,state.currentWeek+dir);
+  renderApp();
+}
+
+function startRoutine(routineId){
+  const r=ROUTINES.find(x=>x.id===routineId);
+  if(!r)return;
+  state.activeRoutineId=routineId;
+  state.currentLog={
+    routineId:routineId,
+    exercises:r.exos.map(e=>{
+      const adapt=computeAdaptiveTarget(e.name,e.target,e.sets);
+      return{
+        name:e.name,
+        target:adapt.target,
+        adaptTrend:adapt.trend,
+        adaptReason:adapt.reason,
+        sets:Array(e.sets).fill(null).map(()=>({weight:"",reps:""}))
+      };
+    })
+  };
+  state.view="log";
+  renderApp();
+}
+
+
+function renderSummaryScreen(){
+  const app=document.getElementById("app");
+  const s=state.lastSummary;
+  if(!s){state.view="routines";renderApp();return "";}
+
+  let html=`<div class="profile-hdr" style="padding:16px">
+    <div style="font-size:11px;color:var(--gr);text-transform:uppercase;letter-spacing:.1em">Séance terminée</div>
+  </div>`;
+
+  html+=`<div class="summary-wrap">
+    <div class="summary-ico">🔥</div>
+    <div class="summary-title">SÉANCE COMPLÈTE</div>
+    <div class="summary-sub">${s.routineLabel||"Séance libre"} · ${fmtDate(s.date)}</div>
+    <div class="summary-stats">
+      <div class="summary-stat"><div class="summary-stat-val" style="color:var(--or)">${s.exerciseCount}</div><div class="summary-stat-lbl">Exercices</div></div>
+      <div class="summary-stat"><div class="summary-stat-val" style="color:var(--bl)">${s.totalReps}</div><div class="summary-stat-lbl">Reps totales</div></div>
+      <div class="summary-stat"><div class="summary-stat-val" style="color:var(--ye)">${s.totalVolume}kg</div><div class="summary-stat-lbl">Volume soulevé</div></div>
+      <div class="summary-stat"><div class="summary-stat-val" style="color:var(--gn)">${s.newPRs.length}</div><div class="summary-stat-lbl">Nouveaux PR</div></div>
+    </div>
+
+    ${s.newPRs.length?`<div class="summary-pr-list">
+      <div class="summary-pr-title">🏆 NOUVEAUX RECORDS</div>
+      ${s.newPRs.map(pr=>`<div class="summary-pr-item">
+        <div class="summary-pr-ico">🎉</div>
+        <div class="summary-pr-text"><b style="color:var(--ye)">${pr.name}</b> — ${pr.weight>0?pr.weight+'kg × ':''}${pr.reps} reps</div>
+      </div>`).join('')}
+    </div>`:''}
+
+    ${s.comparisons.length?`<div class="summary-exo-compare">
+      <div class="summary-pr-title">📊 VS DERNIÈRE FOIS</div>
+      ${s.comparisons.map(c=>`<div class="summary-compare-item">
+        <div class="compare-name">${c.name}</div>
+        <div class="compare-trend compare-${c.trend}">${c.trend==='up'?'↑':c.trend==='down'?'↓':'='} ${c.diff}</div>
+      </div>`).join('')}
+    </div>`:''}
+
+    <button class="btn btn-ye" onclick="closeSummary()">Continuer</button>
+  </div>`;
+
+  app.innerHTML=html;
+  return "";
+}
+function closeSummary(){state.view="routines";state.lastSummary=null;renderApp();}
+
+
+function renderNav(){
+  const items=[
+    {id:"routines",ico:"🏋️",label:"Programme"},
+    {id:"log",ico:"➕",label:"Log"},
+    {id:"history",ico:"📋",label:"Historique"},
+    {id:"stats",ico:"📈",label:"Stats"},
+    {id:"evolution",ico:"📸",label:"Évolution"},
+  ];
+  return`<nav class="nav">${items.map(n=>`<button class="nav-btn${state.view===n.id?' active':''}" onclick="setView('${n.id}')">
+    <span class="ico">${n.ico}</span>${n.label}</button>`).join('')}</nav>`;
+}
+
+// ═══════════════════════════════
+// ACTIONS
+// ═══════════════════════════════
+function setView(v){state.view=v;renderApp();}
+
+function uploadAvatar(input){
+  const f=input.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{state.profile.avatar=e.target.result;save();renderApp();};
+  r.readAsDataURL(f);
+}
+
+function addExoToLog(){
+  const sel=document.getElementById("exo-select");
+  const name=sel.value;
+  state.currentLog.exercises.push({name,sets:[{weight:"",reps:""}]});
+  renderApp();
+}
+function removeExoFromLog(ei){state.currentLog.exercises.splice(ei,1);renderApp();}
+function addSet(ei){state.currentLog.exercises[ei].sets.push({weight:"",reps:""});renderApp();}
+function removeSet(ei,si){
+  if(state.currentLog.exercises[ei].sets.length>1)state.currentLog.exercises[ei].sets.splice(si,1);
+  renderApp();
+}
+function updateSet(ei,si,field,val){
+  state.currentLog.exercises[ei].sets[si][field]=val;
+}
+function finishWorkout(){
+  if(!state.currentLog.exercises.length)return;
+  const valid=state.currentLog.exercises.filter(e=>e.sets.some(s=>s.weight!==""||s.reps!==""));
+  if(!valid.length){alert("Ajoute au moins un poids ou des reps.");return;}
+
+  // Calcule les PRs AVANT d'ajouter la séance pour détecter les nouveaux records
+  const prsBefore=getPRs();
+
+  const vol=valid.reduce((t,e)=>t+e.sets.reduce((t2,s)=>t2+(parseFloat(s.weight)||0)*(parseInt(s.reps)||0),0),0);
+  const totalReps=valid.reduce((t,e)=>t+e.sets.reduce((t2,s)=>t2+(parseInt(s.reps)||0),0),0);
+
+  state.workouts.push({id:Date.now(),date:today(),exercises:valid,routineId:state.currentLog.routineId||null});
+
+  // Détecte les nouveaux PR après ajout
+  const prsAfter=getPRs();
+  const newPRs=[];
+  valid.forEach(e=>{
+    const before=prsBefore[e.name];
+    const after=prsAfter[e.name];
+    if(after&&(!before||after.weight>before.weight||(after.weight===before.weight&&after.reps>before.reps))){
+      if(!before||after.weight>0)newPRs.push({name:e.name,weight:after.weight,reps:after.reps,isNew:!before});
+    }
+  });
+
+  // Compare avec la dernière séance de même routine pour tendance
+  const routineId=state.currentLog.routineId;
+  let comparisons=[];
+  if(routineId!==null&&routineId!==undefined){
+    const prevWorkouts=state.workouts.filter(w=>w.routineId===routineId).slice(0,-1);
+    const prevWorkout=prevWorkouts[prevWorkouts.length-1];
+    if(prevWorkout){
+      valid.forEach(e=>{
+        const prevExo=prevWorkout.exercises.find(x=>x.name===e.name);
+        if(prevExo){
+          const curMaxW=Math.max(...e.sets.map(s=>parseFloat(s.weight)||0));
+          const prevMaxW=Math.max(...prevExo.sets.map(s=>parseFloat(s.weight)||0));
+          const curTotalReps=e.sets.reduce((t,s)=>t+(parseInt(s.reps)||0),0);
+          const prevTotalReps=prevExo.sets.reduce((t,s)=>t+(parseInt(s.reps)||0),0);
+          let trend="same",diff="=";
+          if(curMaxW>prevMaxW||curTotalReps>prevTotalReps){trend="up";diff="+"+(curTotalReps-prevTotalReps>0?(curTotalReps-prevTotalReps)+" reps":(curMaxW-prevMaxW)+" kg");}
+          else if(curMaxW<prevMaxW||curTotalReps<prevTotalReps){trend="down";diff=(curTotalReps-prevTotalReps)+" reps";}
+          comparisons.push({name:e.name,trend,diff});
+        }
+      });
+    }
+  }
+
+  state.lastSummary={
+    date:today(),
+    exerciseCount:valid.length,
+    totalVolume:Math.round(vol),
+    totalReps,
+    newPRs,
+    comparisons,
+    routineLabel:routineId!==null&&routineId!==undefined?ROUTINES.find(r=>r.id===routineId)?.focus:null
+  };
+
+  state.currentLog={exercises:[]};
+  state.activeRoutineId=null;
+  save();
+  state.view="summary";
+  renderApp();
+}
+
+function toggleHist(id){state.openHist[id]=!state.openHist[id];renderApp();}
+
+function changeStatsExo(v){state.statsExo=v;renderApp();}
+
+function saveMeasurement(){
+  const weight=document.getElementById("m-weight").value;
+  const chest=document.getElementById("m-chest").value;
+  const arms=document.getElementById("m-arms").value;
+  const waist=document.getElementById("m-waist").value;
+  if(!weight&&!chest&&!arms&&!waist)return;
+  state.measurements.push({date:today(),weight,chest,arms,waist});
+  save();renderApp();
+}
+
+function uploadPhoto(input){
+  const f=input.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    state.photos.push({id:Date.now(),date:today(),img:e.target.result});
+    save();renderApp();
+  };
+  r.readAsDataURL(f);
+}
+function deletePhoto(id){
+  state.photos=state.photos.filter(p=>p.id!=id);
+  save();renderApp();
+}
+
+load();renderApp();
+</script>
+</body>
+</html>
