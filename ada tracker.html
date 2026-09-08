@@ -178,6 +178,13 @@ html,body{background:var(--bg);color:var(--wh);font-family:-apple-system,BlinkMa
 .video-link-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:linear-gradient(135deg,#c4302b,#8b0000);border:none;border-radius:10px;color:#fff;font-weight:800;font-size:13px;cursor:pointer;margin-bottom:9px;text-decoration:none;}
 .video-link-btn:active{transform:scale(.97);}
 .video-link-ico{font-size:16px;}
+
+.adapt-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:800;padding:3px 8px;border-radius:20px;margin-top:4px;}
+.adapt-up{background:#0a1200;color:var(--ye);border:1px solid var(--ye)44;}
+.adapt-same{background:var(--bg2);color:var(--gr);border:1px solid var(--bd);}
+.adapt-down{background:#1a0a00;color:#ff8866;border:1px solid #ff886644;}
+.adapt-new{background:var(--bg2);color:var(--bl);border:1px solid var(--bl)33;}
+.adapt-explain{font-size:9px;color:var(--gr);margin-top:3px;line-height:1.4;}
 </style>
 </head>
 <body>
@@ -196,7 +203,7 @@ const EXERCISES=[
 
 const ROUTINES=[
   {id:0,label:"LUN",tag:"PUSH A",col:"#FF4D00",focus:"Push · Épaules · Triceps",
-   desc:"Dips · Pompes Archer · Press · Extension Z",timeMin:45,
+   desc:"Dips · Pompes Archer · Press · Extension Z",timeMin:50,
    exos:[
      {name:"Dips",sets:5,target:"5–6",tip:"Descends 90° complet. Torse légèrement penché avant. Tempo 3-0-1."},
      {name:"Pompes Archer",sets:4,target:"5/côté",tip:"Une main large, autre serrée. Transfert du poids sur le bras fléchi."},
@@ -206,286 +213,36 @@ const ROUTINES=[
      {name:"Squat Bulgare",sets:3,target:"8/côté",tip:"Pied arrière sur la barre basse. Genou avant à 90°."},
    ]},
   {id:1,label:"MAR",tag:"PULL A",col:"#4D9FFF",focus:"Tractions · Curl · Dos",
-   desc:"Tractions lourdes · Australian · Curl Z · Marteau",timeMin:45,
+   desc:"Tractions lourdes · Rowing · Curl Z · Marteau",timeMin:50,
    exos:[
      {name:"Tractions Pronation",sets:5,target:"4–6",tip:"Prise large. Omoplate rétractées avant de tirer. Menton au-dessus."},
      {name:"Tractions Supination",sets:4,target:"5–7",tip:"Prise supination épaule de largeur. Biceps actif."},
      {name:"Rowing Inversé",sets:3,target:"10–12",tip:"Corps incliné rigide. Monte 1s, tiens 1s, descend 4s."},
      {name:"Curl Barre Z",sets:5,target:"5–7",tip:"Charge max. Coudes fixes. Monte 2s, descend 3s."},
      {name:"Curl Marteau",sets:3,target:"8–10",tip:"Prise neutre. Coudes fixes. Descend 3s."},
+     {name:"Romanian Deadlift",sets:3,target:"8–10",tip:"Torse en avant dos droit. Descends jusqu'aux ischio."},
    ]},
-  {id:2,label:"MER",tag:"PUSH B",col:"#18C87A",focus:"Push Variantes · Épaules Lourdes",
-   desc:"Dips lestés · Muscle-Up prog · Press lourd",timeMin:45,
+  {id:2,label:"MER",tag:"PUSH B",col:"#18C87A",focus:"Push Variantes · Explosivité",
+   desc:"Dips lestés · Pompes explosives · Press lourd",timeMin:50,
    exos:[
      {name:"Dips",sets:5,target:"4–5",tip:"Plus lourd que lundi. Rajoute du lest si possible."},
      {name:"Pompes Diamant",sets:4,target:"6–8",tip:"Hanches en V. Tête vers le sol. Sac à dos chargé si possible."},
-     {name:"Développé Militaire",sets:3,target:"10–12",tip:"Épaules antérieures + triceps."},
+     {name:"Développé Militaire",sets:3,target:"8–10",tip:"Épaules antérieures + triceps."},
+     {name:"Pompes",sets:3,target:"Max",tip:"Test hebdo. Corps planche parfaite. Arrête dès que la forme casse."},
      {name:"Fentes",sets:3,target:"10/côté",tip:"Grand pas. Genou avant = orteils. Torse droit."},
-   ]},
-  {id:3,label:"JEU",tag:"PULL B",col:"#C8FF00",focus:"Pull Lourd · Biceps · Dos",
-   desc:"Tractions lestées · RDL · Curl lourd",timeMin:45,
-   exos:[
-     {name:"Tractions Pronation",sets:5,target:"3–5",tip:"Plus lourd que mardi. Chaque rep parfaite. Descend 4s."},
-     {name:"Romanian Deadlift",sets:4,target:"8–10",tip:"Torse en avant dos droit. Descends jusqu'aux ischio."},
-     {name:"Curl Barre Z",sets:4,target:"6+8",tip:"Enchaîne curl Z puis curl marteau sans repos."},
-     {name:"Rowing Inversé",sets:3,target:"8",tip:"Monte en 1s, descend en 4s."},
-   ]},
-  {id:4,label:"VEN",tag:"FULL TEST",col:"#FF4DA0",focus:"Test Max · Full Body",
-   desc:"Tests hebdo · Press lourd · Squat",timeMin:45,
-   exos:[
-     {name:"Tractions Pronation",sets:3,target:"Max",tip:"Va jusqu'à l'échec sur chaque série. Note le total."},
-     {name:"Dips",sets:3,target:"Max",tip:"Même principe. Échec propre. Descends toujours à 90°."},
-     {name:"Pompes",sets:1,target:"Max×4 types",tip:"Larges → archer G → archer D → diamant sans repos long."},
-     {name:"Press Épaules Haltères",sets:3,target:"5–6",tip:"Charge max de la semaine."},
      {name:"Squat",sets:2,target:"20",tip:"Profond, contrôlé. Test force-endurance."},
    ]},
-];
-
-
-const BODYWEIGHT_EXOS=["Dips","Tractions Pronation","Tractions Supination","Pompes","Pompes Archer","Pompes Diamant","Squat","Fentes","Muscle-Up"];
-function isBodyweight(name){return BODYWEIGHT_EXOS.includes(name);}
-
-const EXO_YOUTUBE_QUERY={
-  "Dips":"dips street workout technique tutorial",
-  "Tractions Pronation":"pull ups wide grip proper form tutorial",
-  "Tractions Supination":"chin ups proper form tutorial",
-  "Pompes":"push ups perfect form tutorial",
-  "Pompes Archer":"archer push ups tutorial progression",
-  "Pompes Diamant":"diamond push ups proper form tutorial",
-  "Press Épaules Haltères":"dumbbell shoulder press proper form tutorial",
-  "Élévations Latérales":"lateral raises proper form tutorial",
-  "Curl Barre Z":"EZ bar curl proper form tutorial",
-  "Curl Marteau":"hammer curl proper form tutorial",
-  "Extension Triceps Z":"EZ bar skull crusher tricep extension tutorial",
-  "Squat":"bodyweight squat proper form tutorial",
-  "Squat Bulgare":"bulgarian split squat tutorial proper form",
-  "Fentes":"walking lunges proper form tutorial",
-  "Romanian Deadlift":"romanian deadlift dumbbell proper form tutorial",
-  "Développé Couché":"dumbbell bench press proper form tutorial",
-  "Tirage Horizontal":"seated cable row proper form tutorial",
-  "Presse à Cuisses":"leg press machine proper form tutorial",
-  "Développé Militaire":"military press barbell proper form tutorial",
-  "Tirage Vertical":"lat pulldown proper form tutorial",
-  "Rowing Inversé":"inverted row bodyweight tutorial",
-  "Muscle-Up":"muscle up tutorial progression calisthenics",
-};
-function getYoutubeSearchUrl(name){
-  const q=EXO_YOUTUBE_QUERY[name]||(name+" exercise proper form tutorial");
-  return "https://www.youtube.com/results?search_query="+encodeURIComponent(q);
-}
-
-
-
-// ═══════════════════════════════
-// ILLUSTRATIONS SVG DES EXERCICES
-// ═══════════════════════════════
-const OR_C="#FF4D00",OR2_C="#CC3D00",YE_C="#C8FF00",SK_C="#FFB088",GR_C="#333",BG_C="#0d0d0d";
-const EXO_SVG={
-  "Dips": `<svg viewBox="0 0 200 130"><rect width="200" height="130" fill="${BG_C}"/>
-    <rect x="55" y="45" width="8" height="70" rx="4" fill="#444"/><rect x="137" y="45" width="8" height="70" rx="4" fill="#444"/>
-    <rect x="45" y="42" width="30" height="8" rx="4" fill="#666"/><rect x="125" y="42" width="30" height="8" rx="4" fill="#666"/>
-    <g class="anim-dip"><rect x="80" y="55" width="40" height="50" rx="8" fill="${OR_C}"/><circle cx="100" cy="45" r="11" fill="${SK_C}"/>
-    <line x1="90" y1="105" x2="85" y2="128" stroke="${OR2_C}" stroke-width="6" stroke-linecap="round"/>
-    <line x1="110" y1="105" x2="115" y2="128" stroke="${OR2_C}" stroke-width="6" stroke-linecap="round"/></g>
-    <line x1="82" y1="65" x2="63" y2="50" stroke="${OR_C}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="118" y1="65" x2="137" y2="50" stroke="${OR_C}" stroke-width="7" stroke-linecap="round"/></svg>`,
-
-  "Tractions Pronation": `<svg viewBox="0 0 200 130"><rect width="200" height="130" fill="${BG_C}"/>
-    <rect x="15" y="18" width="170" height="10" rx="5" fill="#555"/>
-    <g class="anim-pullup"><rect x="85" y="52" width="30" height="42" rx="8" fill="${OR_C}"/><circle cx="100" cy="42" r="12" fill="${SK_C}"/>
-    <line x1="92" y1="94" x2="86" y2="120" stroke="${OR2_C}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="108" y1="94" x2="114" y2="120" stroke="${OR2_C}" stroke-width="7" stroke-linecap="round"/></g>
-    <line x1="87" y1="58" x2="40" y2="28" stroke="${OR_C}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="113" y1="58" x2="160" y2="28" stroke="${OR_C}" stroke-width="8" stroke-linecap="round"/></svg>`,
-
-  "Tractions Supination": `<svg viewBox="0 0 200 130"><rect width="200" height="130" fill="${BG_C}"/>
-    <rect x="15" y="18" width="170" height="10" rx="5" fill="#555"/>
-    <g class="anim-pullup"><rect x="85" y="52" width="30" height="42" rx="8" fill="${OR_C}"/><circle cx="100" cy="42" r="12" fill="${SK_C}"/>
-    <line x1="92" y1="94" x2="86" y2="120" stroke="${OR2_C}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="108" y1="94" x2="114" y2="120" stroke="${OR2_C}" stroke-width="7" stroke-linecap="round"/></g>
-    <line x1="88" y1="58" x2="72" y2="28" stroke="${OR_C}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="112" y1="58" x2="128" y2="28" stroke="${OR_C}" stroke-width="8" stroke-linecap="round"/></svg>`,
-
-  "Pompes": `<svg viewBox="0 0 200 110"><rect width="200" height="110" fill="${BG_C}"/>
-    <line x1="10" y1="95" x2="190" y2="95" stroke="${GR_C}" stroke-width="2"/>
-    <g class="anim-pushup"><rect x="55" y="68" width="90" height="13" rx="6" fill="${OR_C}"/><circle cx="158" cy="67" r="11" fill="${SK_C}"/></g>
-    <line x1="62" y1="74" x2="22" y2="95" stroke="${OR_C}" stroke-width="9" stroke-linecap="round"/>
-    <line x1="138" y1="74" x2="178" y2="95" stroke="${OR_C}" stroke-width="9" stroke-linecap="round"/>
-    <rect x="15" y="82" width="52" height="11" rx="5" fill="#444"/></svg>`,
-
-  "Pompes Archer": `<svg viewBox="0 0 200 110"><rect width="200" height="110" fill="${BG_C}"/>
-    <line x1="10" y1="95" x2="190" y2="95" stroke="${GR_C}" stroke-width="2"/>
-    <g class="anim-pushup"><rect x="55" y="68" width="90" height="13" rx="6" fill="${OR_C}"/><circle cx="158" cy="67" r="11" fill="${SK_C}"/></g>
-    <line x1="60" y1="74" x2="15" y2="95" stroke="${OR_C}" stroke-width="9" stroke-linecap="round"/>
-    <line x1="140" y1="74" x2="150" y2="88" stroke="${OR2_C}" stroke-width="6" stroke-linecap="round"/>
-    <rect x="15" y="82" width="52" height="11" rx="5" fill="#444"/></svg>`,
-
-  "Pompes Diamant": `<svg viewBox="0 0 200 110"><rect width="200" height="110" fill="${BG_C}"/>
-    <line x1="10" y1="95" x2="190" y2="95" stroke="${GR_C}" stroke-width="2"/>
-    <g class="anim-pushup"><rect x="55" y="68" width="90" height="13" rx="6" fill="${OR_C}"/><circle cx="158" cy="67" r="11" fill="${SK_C}"/></g>
-    <line x1="90" y1="74" x2="90" y2="95" stroke="${OR_C}" stroke-width="9" stroke-linecap="round"/>
-    <line x1="110" y1="74" x2="110" y2="95" stroke="${OR_C}" stroke-width="9" stroke-linecap="round"/>
-    <rect x="15" y="82" width="52" height="11" rx="5" fill="#444"/></svg>`,
-
-  "Press Épaules Haltères": `<svg viewBox="0 0 200 130"><rect width="200" height="130" fill="${BG_C}"/>
-    <line x1="10" y1="118" x2="190" y2="118" stroke="${GR_C}" stroke-width="2"/>
-    <rect x="86" y="45" width="28" height="45" rx="9" fill="${OR_C}"/><circle cx="100" cy="35" r="11" fill="${SK_C}"/>
-    <g class="anim-press"><line x1="90" y1="55" x2="70" y2="25" stroke="${OR_C}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="110" y1="55" x2="130" y2="25" stroke="${OR_C}" stroke-width="7" stroke-linecap="round"/>
-    <circle cx="68" cy="20" r="8" fill="#555"/><circle cx="132" cy="20" r="8" fill="#555"/></g>
-    <line x1="93" y1="90" x2="88" y2="118" stroke="${OR2_C}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="107" y1="90" x2="112" y2="118" stroke="${OR2_C}" stroke-width="8" stroke-linecap="round"/></svg>`,
-
-  "Élévations Latérales": `<svg viewBox="0 0 200 130"><rect width="200" height="130" fill="${BG_C}"/>
-    <line x1="10" y1="118" x2="190" y2="118" stroke="${GR_C}" stroke-width="2"/>
-    <rect x="88" y="50" width="24" height="45" rx="8" fill="${OR_C}"/><circle cx="100" cy="40" r="11" fill="${SK_C}"/>
-    <g class="anim-lateral"><line x1="90" y1="60" x2="55" y2="60" stroke="${OR_C}" stroke-width="7" stroke-linecap="round"/>
-    <circle cx="52" cy="60" r="7" fill="#555"/></g>
-    <line x1="110" y1="60" x2="145" y2="60" stroke="${OR_C}" stroke-width="7" stroke-linecap="round"/>
-    <circle cx="148" cy="60" r="7" fill="#555"/>
-    <line x1="93" y1="95" x2="88" y2="118" stroke="${OR2_C}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="107" y1="95" x2="112" y2="118" stroke="${OR2_C}" stroke-width="8" stroke-linecap="round"/></svg>`,
-
-  "Curl Barre Z": `<svg viewBox="0 0 200 130"><rect width="200" height="130" fill="${BG_C}"/>
-    <line x1="10" y1="118" x2="190" y2="118" stroke="${GR_C}" stroke-width="2"/>
-    <rect x="88" y="30" width="24" height="35" rx="8" fill="${OR_C}"/><circle cx="100" cy="20" r="11" fill="${SK_C}"/>
-    <line x1="90" y1="50" x2="70" y2="65" stroke="${OR_C}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="110" y1="50" x2="130" y2="65" stroke="${OR_C}" stroke-width="8" stroke-linecap="round"/>
-    <g class="anim-curl-l"><line x1="70" y1="65" x2="68" y2="80" stroke="${OR2_C}" stroke-width="7" stroke-linecap="round"/></g>
-    <g class="anim-curl-r"><line x1="130" y1="65" x2="132" y2="80" stroke="${OR2_C}" stroke-width="7" stroke-linecap="round"/></g>
-    <rect x="55" y="78" width="90" height="8" rx="4" fill="#555"/>
-    <line x1="93" y1="65" x2="88" y2="118" stroke="${OR2_C}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="107" y1="65" x2="112" y2="118" stroke="${OR2_C}" stroke-width="7" stroke-linecap="round"/></svg>`,
-
-  "Curl Marteau": `<svg viewBox="0 0 200 130"><rect width="200" height="130" fill="${BG_C}"/>
-    <line x1="10" y1="118" x2="190" y2="118" stroke="${GR_C}" stroke-width="2"/>
-    <rect x="88" y="30" width="24" height="35" rx="8" fill="${OR_C}"/><circle cx="100" cy="20" r="11" fill="${SK_C}"/>
-    <line x1="90" y1="50" x2="72" y2="63" stroke="${OR_C}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="72" y1="63" x2="70" y2="80" stroke="${OR2_C}" stroke-width="7" stroke-linecap="round"/>
-    <circle cx="68" cy="85" r="7" fill="#555"/>
-    <line x1="110" y1="50" x2="128" y2="63" stroke="${OR_C}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="128" y1="63" x2="130" y2="80" stroke="${OR2_C}" stroke-width="7" stroke-linecap="round"/>
-    <circle cx="132" cy="85" r="7" fill="#555"/>
-    <line x1="93" y1="65" x2="88" y2="118" stroke="${OR2_C}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="107" y1="65" x2="112" y2="118" stroke="${OR2_C}" stroke-width="7" stroke-linecap="round"/></svg>`,
-
-  "Extension Triceps Z": `<svg viewBox="0 0 200 130"><rect width="200" height="130" fill="${BG_C}"/>
-    <line x1="10" y1="118" x2="190" y2="118" stroke="${GR_C}" stroke-width="2"/>
-    <rect x="88" y="35" width="24" height="35" rx="8" fill="${OR_C}"/><circle cx="100" cy="25" r="11" fill="${SK_C}"/>
-    <line x1="93" y1="45" x2="80" y2="30" stroke="${OR_C}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="80" y1="30" x2="65" y2="45" stroke="${OR2_C}" stroke-width="6" stroke-linecap="round"/>
-    <line x1="107" y1="45" x2="120" y2="30" stroke="${OR_C}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="120" y1="30" x2="135" y2="45" stroke="${OR2_C}" stroke-width="6" stroke-linecap="round"/>
-    <rect x="60" y="42" width="80" height="7" rx="3" fill="#555"/>
-    <line x1="93" y1="70" x2="88" y2="118" stroke="${OR2_C}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="107" y1="70" x2="112" y2="118" stroke="${OR2_C}" stroke-width="8" stroke-linecap="round"/></svg>`,
-
-  "Squat": `<svg viewBox="0 0 200 130"><rect width="200" height="130" fill="${BG_C}"/>
-    <line x1="10" y1="118" x2="190" y2="118" stroke="${GR_C}" stroke-width="2"/>
-    <g class="anim-squat"><rect x="84" y="28" width="32" height="38" rx="9" fill="${OR_C}"/><circle cx="100" cy="18" r="12" fill="${SK_C}"/>
-    <line x1="86" y1="45" x2="68" y2="58" stroke="${OR2_C}" stroke-width="6" stroke-linecap="round"/>
-    <line x1="114" y1="45" x2="132" y2="58" stroke="${OR2_C}" stroke-width="6" stroke-linecap="round"/>
-    <line x1="95" y1="66" x2="72" y2="95" stroke="${OR_C}" stroke-width="10" stroke-linecap="round"/>
-    <line x1="105" y1="66" x2="128" y2="95" stroke="${OR_C}" stroke-width="10" stroke-linecap="round"/>
-    <line x1="72" y1="95" x2="65" y2="118" stroke="${OR2_C}" stroke-width="9" stroke-linecap="round"/>
-    <line x1="128" y1="95" x2="135" y2="118" stroke="${OR2_C}" stroke-width="9" stroke-linecap="round"/></g></svg>`,
-
-  "Squat Bulgare": `<svg viewBox="0 0 200 130"><rect width="200" height="130" fill="${BG_C}"/>
-    <line x1="10" y1="118" x2="190" y2="118" stroke="${GR_C}" stroke-width="2"/>
-    <rect x="130" y="90" width="40" height="8" rx="4" fill="#444"/>
-    <line x1="95" y1="55" x2="80" y2="95" stroke="${OR_C}" stroke-width="9" stroke-linecap="round"/>
-    <line x1="80" y1="95" x2="70" y2="118" stroke="${OR2_C}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="95" y1="55" x2="130" y2="80" stroke="${OR_C}" stroke-width="9" stroke-linecap="round"/>
-    <line x1="130" y1="80" x2="140" y2="94" stroke="${OR2_C}" stroke-width="7" stroke-linecap="round"/>
-    <rect x="85" y="30" width="20" height="28" rx="8" fill="${OR_C}"/><circle cx="95" cy="20" r="11" fill="${SK_C}"/></svg>`,
-
-  "Fentes": `<svg viewBox="0 0 200 130"><rect width="200" height="130" fill="${BG_C}"/>
-    <line x1="10" y1="118" x2="190" y2="118" stroke="${GR_C}" stroke-width="2"/>
-    <g class="anim-lunge"><line x1="100" y1="55" x2="120" y2="90" stroke="${OR_C}" stroke-width="10" stroke-linecap="round"/>
-    <line x1="120" y1="90" x2="140" y2="118" stroke="${OR2_C}" stroke-width="9" stroke-linecap="round"/>
-    <line x1="100" y1="55" x2="75" y2="80" stroke="${OR_C}" stroke-width="10" stroke-linecap="round"/>
-    <line x1="75" y1="80" x2="68" y2="118" stroke="${OR2_C}" stroke-width="8" stroke-linecap="round"/>
-    <rect x="88" y="28" width="24" height="30" rx="8" fill="${OR_C}"/><circle cx="100" cy="18" r="11" fill="${SK_C}"/></g></svg>`,
-
-  "Romanian Deadlift": `<svg viewBox="0 0 200 130"><rect width="200" height="130" fill="${BG_C}"/>
-    <line x1="10" y1="118" x2="190" y2="118" stroke="${GR_C}" stroke-width="2"/>
-    <line x1="88" y1="90" x2="78" y2="118" stroke="${OR2_C}" stroke-width="9" stroke-linecap="round"/>
-    <line x1="112" y1="90" x2="122" y2="118" stroke="${OR2_C}" stroke-width="9" stroke-linecap="round"/>
-    <rect x="94" y="45" width="14" height="55" rx="7" fill="${OR_C}" transform="rotate(-30 100 70)"/>
-    <circle cx="70" cy="55" r="11" fill="${SK_C}"/>
-    <line x1="72" y1="65" x2="90" y2="85" stroke="${OR2_C}" stroke-width="6" stroke-linecap="round"/>
-    <rect x="85" y="83" width="10" height="8" rx="4" fill="#555"/></svg>`,
-
-  "Développé Couché": `<svg viewBox="0 0 200 110"><rect width="200" height="110" fill="${BG_C}"/>
-    <rect x="30" y="75" width="140" height="14" rx="6" fill="#3a3a3a"/>
-    <rect x="65" y="55" width="70" height="20" rx="8" fill="${OR_C}"/><circle cx="150" cy="60" r="10" fill="${SK_C}"/>
-    <line x1="90" y1="60" x2="90" y2="35" stroke="${OR_C}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="110" y1="60" x2="110" y2="35" stroke="${OR_C}" stroke-width="7" stroke-linecap="round"/>
-    <rect x="70" y="30" width="60" height="7" rx="3" fill="#555"/>
-    <circle cx="65" cy="33" r="9" fill="#444"/><circle cx="135" cy="33" r="9" fill="#444"/></svg>`,
-
-  "Tirage Horizontal": `<svg viewBox="0 0 200 110"><rect width="200" height="110" fill="${BG_C}"/>
-    <line x1="10" y1="95" x2="190" y2="95" stroke="${GR_C}" stroke-width="2"/>
-    <rect x="80" y="55" width="24" height="35" rx="8" fill="${OR_C}"/><circle cx="150" cy="55" r="10" fill="${SK_C}"/>
-    <line x1="100" y1="65" x2="140" y2="60" stroke="${OR_C}" stroke-width="7" stroke-linecap="round"/>
-    <rect x="30" y="58" width="15" height="10" rx="3" fill="#555"/>
-    <line x1="80" y1="70" x2="45" y2="63" stroke="#666" stroke-width="2" stroke-dasharray="3,2"/>
-    <line x1="88" y1="90" x2="70" y2="95" stroke="${OR2_C}" stroke-width="8" stroke-linecap="round"/></svg>`,
-
-  "Presse à Cuisses": `<svg viewBox="0 0 200 110"><rect width="200" height="110" fill="${BG_C}"/>
-    <rect x="20" y="70" width="60" height="30" rx="6" fill="#3a3a3a" transform="rotate(-15 20 70)"/>
-    <rect x="70" y="30" width="12" height="60" rx="4" fill="#444"/>
-    <circle cx="130" cy="55" r="11" fill="${SK_C}"/>
-    <rect x="100" y="60" width="35" height="18" rx="7" fill="${OR_C}"/>
-    <line x1="105" y1="75" x2="90" y2="90" stroke="${OR_C}" stroke-width="9" stroke-linecap="round"/>
-    <line x1="90" y1="90" x2="80" y2="80" stroke="${OR2_C}" stroke-width="8" stroke-linecap="round"/></svg>`,
-
-  "Développé Militaire": `<svg viewBox="0 0 200 130"><rect width="200" height="130" fill="${BG_C}"/>
-    <line x1="10" y1="118" x2="190" y2="118" stroke="${GR_C}" stroke-width="2"/>
-    <rect x="86" y="45" width="28" height="45" rx="9" fill="${OR_C}"/><circle cx="100" cy="35" r="11" fill="${SK_C}"/>
-    <rect x="60" y="20" width="80" height="8" rx="4" fill="#555"/>
-    <circle cx="58" cy="24" r="8" fill="#444"/><circle cx="142" cy="24" r="8" fill="#444"/>
-    <line x1="90" y1="55" x2="65" y2="26" stroke="${OR_C}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="110" y1="55" x2="135" y2="26" stroke="${OR_C}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="93" y1="90" x2="88" y2="118" stroke="${OR2_C}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="107" y1="90" x2="112" y2="118" stroke="${OR2_C}" stroke-width="8" stroke-linecap="round"/></svg>`,
-
-  "Tirage Vertical": `<svg viewBox="0 0 200 130"><rect width="200" height="130" fill="${BG_C}"/>
-    <line x1="10" y1="118" x2="190" y2="118" stroke="${GR_C}" stroke-width="2"/>
-    <rect x="70" y="35" width="10" height="8" rx="4" fill="#555"/><rect x="120" y="35" width="10" height="8" rx="4" fill="#555"/>
-    <rect x="86" y="50" width="28" height="45" rx="9" fill="${OR_C}"/><circle cx="100" cy="40" r="11" fill="${SK_C}"/>
-    <line x1="90" y1="58" x2="72" y2="42" stroke="${OR_C}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="110" y1="58" x2="128" y2="42" stroke="${OR_C}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="93" y1="95" x2="88" y2="118" stroke="${OR2_C}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="107" y1="95" x2="112" y2="118" stroke="${OR2_C}" stroke-width="8" stroke-linecap="round"/></svg>`,
-
-  "Rowing Inversé": `<svg viewBox="0 0 200 120"><rect width="200" height="120" fill="${BG_C}"/>
-    <rect x="28" y="55" width="144" height="8" rx="4" fill="#555"/>
-    <g class="anim-row"><rect x="62" y="62" width="76" height="12" rx="6" fill="${OR_C}" transform="rotate(-15 62 62)"/>
-    <circle cx="158" cy="52" r="10" fill="${SK_C}"/>
-    <line x1="75" y1="66" x2="55" y2="59" stroke="${OR_C}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="122" y1="63" x2="142" y2="59" stroke="${OR_C}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="68" y1="74" x2="42" y2="108" stroke="${OR2_C}" stroke-width="7" stroke-linecap="round"/>
-    <line x1="82" y1="72" x2="60" y2="108" stroke="${OR2_C}" stroke-width="7" stroke-linecap="round"/></g></svg>`,
-
-  "Muscle-Up": `<svg viewBox="0 0 200 130"><rect width="200" height="130" fill="${BG_C}"/>
-    <rect x="15" y="18" width="170" height="10" rx="5" fill="#555"/>
-    <rect x="80" y="35" width="40" height="30" rx="8" fill="${OR_C}"/><circle cx="100" cy="26" r="11" fill="${SK_C}"/>
-    <line x1="82" y1="42" x2="60" y2="30" stroke="${OR_C}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="118" y1="42" x2="140" y2="30" stroke="${OR_C}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="88" y1="65" x2="80" y2="95" stroke="${OR2_C}" stroke-width="8" stroke-linecap="round"/>
-    <line x1="112" y1="65" x2="120" y2="95" stroke="${OR2_C}" stroke-width="8" stroke-linecap="round"/>
-    <path d="M100 90 L100 70" stroke="${YE_C}" stroke-width="2" stroke-dasharray="3,2"/>
-    <polygon points="100,65 95,75 105,75" fill="${YE_C}"/></svg>`,
-};
-
-function getExoVisual(name){
-  return EXO_SVG[name]||`<svg viewBox="0 0 200 110"><rect width="200" height="110" fill="${BG_C}"/>
-    <circle cx="100" cy="45" r="24" fill="${OR_C}" opacity="0.25"/>
-    <text x="100" y="52" text-anchor="middle" font-size="22" fill="${OR_C}">💪</text></svg>`;
-}
-
-
+  {id:3,label:"JEU",tag:"PULL B",col:"#C8FF00",focus:"Pull Lourd · Test · Biceps",
+   desc:"Tractions max · RDL · Curl lourd",timeMin:50,
+   exos:[
+     {name:"Tractions Pronation",sets:3,target:"Max",tip:"Test hebdo. Va jusqu'à l'échec sur chaque série. Note le total."},
+     {name:"Tractions Supination",sets:4,target:"3–5",tip:"Plus lourd que mardi. Chaque rep parfaite. Descend 4s."},
+     {name:"Curl Barre Z",sets:4,target:"6+8",tip:"Enchaîne curl Z puis curl marteau sans repos."},
+     {name:"Rowing Inversé",sets:3,target:"8",tip:"Monte en 1s, descend en 4s."},
+     {name:"Press Épaules Haltères",sets:3,target:"5–6",tip:"Charge max de la semaine."},
+     {name:"Romanian Deadlift",sets:3,target:"8–10",tip:"Torse en avant dos droit."},
+   ]},
+]
 
 const KEY="ada_tracker_v1";
 let state={
@@ -523,6 +280,67 @@ function save(){
 function today(){return new Date().toISOString().slice(0,10);}
 function fmtDate(d){return new Date(d+"T12:00:00").toLocaleDateString("fr-FR",{day:"2-digit",month:"short",year:"2-digit"});}
 function daysSince(d){return Math.floor((new Date()-new Date(d))/(1000*60*60*24));}
+
+
+// ═══════════════════════════════════════════════
+// MOTEUR D'AJUSTEMENT AUTOMATIQUE (progression hebdo)
+// ═══════════════════════════════════════════════
+function getExoHistory(name){
+  // Toutes les occurrences de cet exercice, triées par date
+  const occ=[];
+  state.workouts.forEach(w=>{
+    w.exercises.forEach(e=>{
+      if(e.name===name)occ.push({date:w.date,sets:e.sets});
+    });
+  });
+  return occ.sort((a,b)=>a.date.localeCompare(b.date));
+}
+
+function computeAdaptiveTarget(name,baseTarget,baseSets){
+  const hist=getExoHistory(name);
+  if(!hist.length)return{target:baseTarget,sets:baseSets,trend:"new",reason:"Objectif de départ — pas encore de données"};
+
+  const last=hist[hist.length-1];
+  const validSets=last.sets.filter(s=>s.reps!==""&&s.reps!==null);
+  if(!validSets.length)return{target:baseTarget,sets:baseSets,trend:"same",reason:"Dernière séance incomplète"};
+
+  const reps=validSets.map(s=>parseInt(s.reps)||0);
+  const weights=validSets.map(s=>parseFloat(s.weight)||0);
+  const avgReps=reps.reduce((a,b)=>a+b,0)/reps.length;
+  const maxWeight=Math.max(...weights);
+  const minReps=Math.min(...reps);
+
+  // Parse la cible de base (ex: "5–6" -> [5,6], "Max" -> null, "12–15" -> [12,15])
+  const rangeMatch=baseTarget.match(/(\d+)[–\-](\d+)/);
+  const isBodyweightExo=isBodyweight(name);
+
+  if(!rangeMatch){
+    // Cible "Max" — pas d'ajustement de range, juste affiche le dernier score comme référence
+    return{target:baseTarget,sets:baseSets,trend:"same",reason:`Dernier record : ${Math.round(avgReps)} reps${maxWeight>0?' à '+maxWeight+'kg':''}`};
+  }
+
+  const lowTarget=parseInt(rangeMatch[1]),highTarget=parseInt(rangeMatch[2]);
+  const hitTop=minReps>=highTarget;
+  const hitAll=minReps>=lowTarget;
+
+  if(hitTop){
+    // Toutes les séries au top de la fourchette → progression
+    if(isBodyweightExo){
+      return{target:baseTarget,sets:baseSets,trend:"up",
+        reason:`💪 Semaine dernière : ${minReps}+ reps sur toutes les séries. Ajoute du lest (+2,5kg) ou vise le haut de la fourchette suivante.`};
+    }else{
+      const newWeight=maxWeight>0?Math.round((maxWeight+2.5)*10)/10:null;
+      return{target:baseTarget,sets:baseSets,trend:"up",
+        reason:`💪 Objectif atteint sur toutes les séries à ${maxWeight}kg. Essaie ${newWeight}kg cette semaine.`};
+    }
+  }else if(hitAll){
+    return{target:baseTarget,sets:baseSets,trend:"same",
+      reason:`✓ Dans la fourchette (min ${minReps} reps). Consolide avant d'augmenter.`};
+  }else{
+    return{target:baseTarget,sets:baseSets,trend:"down",
+      reason:`⚠️ Sous l'objectif (min ${minReps} vs ${lowTarget} visé). Garde la même charge, focus sur la technique.`};
+  }
+}
 
 function computeStreak(){
   if(!state.workouts.length)return 0;
@@ -625,7 +443,9 @@ function renderLog(){
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
           <div>
             <div class="card-title" style="margin:0">${exo.name}</div>
-            ${exo.target?`<div style="font-size:10px;color:var(--gr);margin-top:2px">Cible programme : ${exo.sets.length}× ${exo.target}</div>`:''}
+            ${exo.target?`<div style="font-size:10px;color:var(--gr);margin-top:2px">Cible : ${exo.sets.length}× ${exo.target}</div>`:''}
+            ${exo.adaptReason?`<div class="adapt-badge adapt-${exo.adaptTrend}">${exo.adaptTrend==='up'?'↑ Progression':exo.adaptTrend==='down'?'↓ Maintien':exo.adaptTrend==='new'?'● Nouveau':'= Stable'}</div>
+            <div class="adapt-explain">${exo.adaptReason}</div>`:''}
           </div>
           <div style="font-size:16px;color:#c00;cursor:pointer" onclick="removeExoFromLog(${ei})">✕</div>
         </div>
@@ -813,10 +633,15 @@ function renderRoutines(){
           <span class="routine-pill">${r.exos.length} exercices</span>
         </div>
         <div class="routine-exo-preview">
-          ${r.exos.map(e=>`<div class="routine-exo-chip-v2">
-            <div class="routine-exo-chip-visual">${getExoVisual(e.name)}</div>
-            <span>${e.name}</span>
-          </div>`).join('')}
+          ${r.exos.map(e=>{
+            const adapt=computeAdaptiveTarget(e.name,e.target,e.sets);
+            const trendIcon=adapt.trend==="up"?"↑":adapt.trend==="down"?"↓":adapt.trend==="new"?"●":"=";
+            const trendColor=adapt.trend==="up"?"var(--ye)":adapt.trend==="down"?"#ff8866":adapt.trend==="new"?"var(--bl)":"var(--gr)";
+            return`<div class="routine-exo-chip-v2">
+              <div class="routine-exo-chip-visual">${getExoVisual(e.name)}</div>
+              <span>${e.name} <b style="color:${trendColor}">${trendIcon}</b></span>
+            </div>`;
+          }).join('')}
         </div>
         <button class="routine-start-btn" style="background:${r.col}" onclick="startRoutine(${r.id})">▶ DÉMARRER CETTE SÉANCE</button>
       </div>
@@ -836,11 +661,16 @@ function startRoutine(routineId){
   state.activeRoutineId=routineId;
   state.currentLog={
     routineId:routineId,
-    exercises:r.exos.map(e=>({
-      name:e.name,
-      target:e.target,
-      sets:Array(e.sets).fill(null).map(()=>({weight:"",reps:""}))
-    }))
+    exercises:r.exos.map(e=>{
+      const adapt=computeAdaptiveTarget(e.name,e.target,e.sets);
+      return{
+        name:e.name,
+        target:adapt.target,
+        adaptTrend:adapt.trend,
+        adaptReason:adapt.reason,
+        sets:Array(e.sets).fill(null).map(()=>({weight:"",reps:""}))
+      };
+    })
   };
   state.view="log";
   renderApp();
